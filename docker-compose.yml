@@ -1,0 +1,54 @@
+services:
+  api:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: ragops-api
+    env_file:
+      - ./backend/.env.example
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./logs:/app/logs
+      - ./backend/app:/app/app
+    depends_on:
+      - postgres
+      - redis
+      - qdrant
+    environment:
+      SERVICE_NAME: ragops-api
+      LOG_DIR: /app/logs
+      POSTGRES_HOST: postgres
+      REDIS_HOST: redis
+      QDRANT_HOST: qdrant
+
+  postgres:
+    image: postgres:16-alpine
+    container_name: ragops-postgres
+    environment:
+      POSTGRES_USER: ragops_user
+      POSTGRES_PASSWORD: ragops_password
+      POSTGRES_DB: ragops_db
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+  redis:
+    image: redis:7-alpine
+    container_name: ragops-redis
+    ports:
+      - "6379:6379"
+
+  qdrant:
+    image: qdrant/qdrant:latest
+    container_name: ragops-qdrant
+    ports:
+      - "6333:6333"
+      - "6334:6334"
+    volumes:
+      - qdrant_data:/qdrant/storage
+
+volumes:
+  postgres_data:
+  qdrant_data:

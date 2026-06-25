@@ -1,0 +1,38 @@
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+
+# Virtual environments
+.venv/
+venv/
+env/
+
+# Environment files
+.env
+*.env
+
+# Logs
+logs/*.log
+logs/*.log.*
+
+# Docker/local data
+postgres_data/
+qdrant_data/
+
+# OS/editor
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+
+# Node/frontend later
+node_modules/
+.next/
+out/
+# Local snapshot notes
+SNAPSHOT_NOTE_*.md
