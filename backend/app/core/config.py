@@ -11,6 +11,10 @@ class Settings(BaseSettings):
     log_level: str = "INFO"
     log_dir: str = "logs"
 
+    file_storage_backend: str = "local"
+    storage_dir: str = "storage"
+    upload_dir: str = "storage/uploads"
+
     postgres_host: str = "localhost"
     postgres_port: int = 5432
     postgres_db: str = "ragops_db"

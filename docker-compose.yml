@@ -10,7 +10,10 @@ services:
       - "8000:8000"
     volumes:
       - ./logs:/app/logs
+      - ./storage:/app/storage
       - ./backend/app:/app/app
+      - ./backend/alembic:/app/alembic
+      - ./backend/alembic.ini:/app/alembic.ini
     depends_on:
       - postgres
       - redis
@@ -18,6 +21,9 @@ services:
     environment:
       SERVICE_NAME: ragops-api
       LOG_DIR: /app/logs
+      FILE_STORAGE_BACKEND: local
+      STORAGE_DIR: /app/storage
+      UPLOAD_DIR: /app/storage/uploads
       POSTGRES_HOST: postgres
       REDIS_HOST: redis
       QDRANT_HOST: qdrant

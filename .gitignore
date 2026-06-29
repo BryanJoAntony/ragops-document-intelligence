@@ -34,5 +34,3 @@ Thumbs.db
 node_modules/
 .next/
 out/
-# Local snapshot notes
-SNAPSHOT_NOTE_*.md
