@@ -1,8 +1,6 @@
 from dataclasses import dataclass
+from io import BytesIO
 from pathlib import Path
-
-import fitz
-from docx import Document as DocxDocument
 
 from app.utils.text import normalize_whitespace
 
@@ -46,6 +44,9 @@ class DocumentParserService:
         )
 
     def _parse_pdf(self, file_bytes: bytes) -> ParsedDocument:
+        # Lazy import keeps PyMuPDF/SWIG warnings out of tests that do not parse PDFs.
+        import fitz
+
         pages: list[ParsedPage] = []
 
         with fitz.open(stream=file_bytes, filetype="pdf") as pdf:
@@ -63,7 +64,8 @@ class DocumentParserService:
         )
 
     def _parse_docx(self, file_bytes: bytes) -> ParsedDocument:
-        from io import BytesIO
+        # Lazy import keeps optional parser dependencies isolated to the file types that need them.
+        from docx import Document as DocxDocument
 
         doc = DocxDocument(BytesIO(file_bytes))
         paragraphs = [normalize_whitespace(paragraph.text) for paragraph in doc.paragraphs]

@@ -4,6 +4,7 @@ from fastapi import FastAPI
 
 from app.api.routes.documents import router as documents_router
 from app.api.routes.health import router as health_router
+from app.api.routes.query import router as query_router
 from app.core.config import get_settings
 from app.core.logging import setup_logging
 
@@ -14,12 +15,13 @@ logger = logging.getLogger(__name__)
 
 app = FastAPI(
     title=settings.app_name,
-    version="0.2.0",
+    version="0.5.0",
     description="Production-style RAGOps document intelligence platform.",
 )
 
 app.include_router(health_router)
 app.include_router(documents_router)
+app.include_router(query_router)
 
 
 @app.on_event("startup")
@@ -34,4 +36,5 @@ def root() -> dict[str, str]:
         "docs": "/docs",
         "health": "/health",
         "documents": "/documents",
+        "query": "/query/ask",
     }

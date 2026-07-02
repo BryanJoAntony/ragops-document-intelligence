@@ -26,6 +26,17 @@ class Settings(BaseSettings):
 
     qdrant_host: str = "localhost"
     qdrant_port: int = 6333
+    qdrant_collection_name: str = "ragops_chunks"
+
+    embedding_provider: str = "sentence_transformers"
+    embedding_model: str = "sentence-transformers/all-MiniLM-L6-v2"
+    embedding_dimension: int = 384
+
+    retrieval_top_k: int = 5
+
+    answer_provider: str = "local_extractive"
+    answer_model: str = "local_extractive_v1"
+    max_context_chunks: int = 5
 
     model_config = SettingsConfigDict(
         env_file=".env",

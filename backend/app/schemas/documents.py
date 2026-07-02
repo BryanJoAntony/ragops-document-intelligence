@@ -54,3 +54,23 @@ class DocumentChunkResponse(BaseModel):
 class DocumentIngestionResponse(BaseModel):
     document: DocumentResponse
     chunk_count: int
+
+
+class DocumentIndexingResponse(BaseModel):
+    document: DocumentResponse
+    indexed_chunk_count: int
+
+
+class RetrievedChunkResponse(BaseModel):
+    chunk_id: UUID
+    document_id: UUID
+    chunk_index: int
+    score: float
+    text_preview: str
+    chunk_text: str
+    metadata: dict[str, Any]
+
+
+class DocumentSearchRequest(BaseModel):
+    query: str
+    top_k: int = 5

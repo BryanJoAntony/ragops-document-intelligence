@@ -8,12 +8,17 @@ from app.api.deps import get_db
 from app.db.models import DocumentChunk
 from app.schemas.documents import (
     DocumentChunkResponse,
+    DocumentIndexingResponse,
     DocumentIngestionResponse,
     DocumentResponse,
+    DocumentSearchRequest,
     DocumentUploadResponse,
+    RetrievedChunkResponse,
 )
+from app.services.document_indexing_service import DocumentIndexingService
 from app.services.document_ingestion_service import DocumentIngestionService
 from app.services.document_service import DocumentService
+from app.services.retrieval_service import RetrievalService
 
 router = APIRouter(prefix="/documents", tags=["documents"])
 
@@ -77,6 +82,39 @@ def ingest_document(
     return DocumentIngestionResponse(
         document=document,
         chunk_count=chunk_count,
+    )
+
+
+@router.post("/{document_id}/index", response_model=DocumentIndexingResponse)
+def index_document(
+    document_id: UUID,
+    db: Session = Depends(get_db),
+) -> DocumentIndexingResponse:
+    service = DocumentIndexingService(db)
+
+    try:
+        document, indexed_chunk_count = service.index_document(document_id)
+    except ValueError as exc:
+        raise HTTPException(status_code=400, detail=str(exc)) from exc
+
+    return DocumentIndexingResponse(
+        document=document,
+        indexed_chunk_count=indexed_chunk_count,
+    )
+
+
+@router.post("/{document_id}/search", response_model=list[RetrievedChunkResponse])
+def search_document(
+    document_id: UUID,
+    request: DocumentSearchRequest,
+    db: Session = Depends(get_db),
+) -> list[RetrievedChunkResponse]:
+    service = RetrievalService(db)
+
+    return service.vector_search(
+        query=request.query,
+        top_k=request.top_k,
+        document_id=document_id,
     )
 
 

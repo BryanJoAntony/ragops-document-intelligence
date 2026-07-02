@@ -5,11 +5,15 @@ from app.services.storage.local import LocalStorageService
 
 def get_storage_service() -> StorageService:
     settings = get_settings()
-    backend = settings.file_storage_backend.lower().strip()
+    return get_storage_service_for_backend(settings.file_storage_backend)
+
+
+def get_storage_service_for_backend(backend_name: str) -> StorageService:
+    backend = backend_name.lower().strip()
 
     if backend == "local":
         return LocalStorageService()
 
     raise NotImplementedError(
-        f"File storage backend '{settings.file_storage_backend}' is configured but not implemented yet."
+        f"File storage backend '{backend_name}' is configured but not implemented yet."
     )
