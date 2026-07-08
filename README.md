@@ -1,14 +1,14 @@
 ﻿# ragops-document-intelligence
 
-A production-style RAGOps/document intelligence platform for ingesting documents, storing metadata, parsing content, chunking with traceability, indexing chunks into a vector database, retrieving relevant context, generating cited answers, and preparing for RAG quality evaluation.
+A production-style RAGOps/document intelligence platform for ingesting documents, storing metadata, parsing content, chunking with traceability, indexing chunks into a vector database, retrieving relevant context, generating cited answers, tracking audit history, and preparing for RAG quality evaluation.
 
 This project is being built milestone by milestone to demonstrate backend engineering for AI systems, not just a basic chatbot demo.
 
 ## Current public milestone
 
-Milestone 2: retrieval and cited answer foundation.
+Milestone 3: hybrid retrieval and configurable answer providers.
 
-This public milestone combines the internal embeddings, Qdrant indexing, vector search, cited local answer generation, and audit logging work into one GitHub milestone after the document ingestion foundation.
+This public milestone combines the internal hybrid retrieval and configurable answer-provider work into one GitHub milestone after the retrieval and cited answer foundation.
 
 ## What this milestone includes
 
@@ -19,42 +19,37 @@ This public milestone combines the internal embeddings, Qdrant indexing, vector 
 - Qdrant vector database service
 - SQLAlchemy ORM setup
 - Alembic database migrations
-- Document upload endpoint
-- Local file storage abstraction
-- SHA-256 file hashing
-- Duplicate document detection
-- TXT parsing
-- PDF parsing
-- DOCX parsing
-- Document chunking
-- Chunk-level metadata
-- Generated document and chunk tags
+- Document upload and local storage
+- SHA-256 file hashing and duplicate detection
+- TXT, PDF, and DOCX parsing
+- Document chunking with metadata
 - Sentence-transformer embeddings
 - Qdrant vector indexing
 - Vector search over document chunks
+- BM25 keyword retrieval
+- Fuzzy retrieval
+- Hybrid retrieval with score merging
+- Retrieval score details
 - Basic cited RAG answer generation
 - Query audit logging in PostgreSQL
 - LLM call logging in PostgreSQL
+- Configurable answer providers
+- Local deterministic answer provider
+- Optional OpenAI answer provider
+- Token estimate metadata
+- Estimated cost metadata
+- Clean OpenAI missing-key error handling
 - pytest test foundation
 - Dependency health checks
 - Structured logging foundation
 
 ## Why this matters
 
-A RAG system needs more than an LLM call.
+A RAG system needs more than vector search and an LLM call.
 
-Before answer quality can be improved, the system needs to support:
+Retrieval quality depends on how chunks are selected, scored, combined, and inspected. This milestone adds multiple retrieval modes and makes provider selection explicit so the system can be tested locally while still supporting external LLM providers later.
 
-- reliable document ingestion
-- traceable chunks
-- vector indexing
-- retrieval over stored chunks
-- cited answer generation
-- query audit history
-- model/call logging
-- testable service boundaries
-
-This milestone moves the project from document ingestion into the first working retrieval and answer flow.
+The goal is to make retrieval and answer generation easier to debug, audit, and improve.
 
 ## Architecture at this milestone
 
@@ -84,8 +79,16 @@ Qdrant vector index
         v
 Retrieval service
         |
+        +--> vector retrieval
+        +--> BM25 retrieval
+        +--> fuzzy retrieval
+        +--> hybrid retrieval
+        |
         v
 Answer generation service
+        |
+        +--> local_extractive provider
+        +--> optional OpenAI provider
         |
         v
 Cited answer + PostgreSQL audit logs
@@ -104,11 +107,33 @@ Current service responsibilities include:
 - embedding service: creates embeddings for document chunks
 - vector store service: manages Qdrant collection and indexing operations
 - document indexing service: sends chunk embeddings into Qdrant
-- retrieval service: retrieves relevant chunks
-- answer generation service: creates conservative cited local answers
+- retrieval service: retrieves relevant chunks across vector, BM25, fuzzy, and hybrid modes
+- answer generation service: creates cited answers using the selected provider
 - audit service: records query and model-call history in PostgreSQL
 
 This structure keeps routes thin and prepares the project for later orchestration, evaluation, dashboards, background jobs, and agent/MCP-style tools.
+
+## Retrieval modes
+
+Current retrieval modes:
+
+- vector: semantic similarity using Qdrant
+- BM25: keyword-based retrieval over stored chunks
+- fuzzy: approximate text matching over chunk metadata/text
+- hybrid: combines vector, BM25, and fuzzy signals into a merged score
+
+Hybrid retrieval returns score details so the retrieved chunks can be inspected instead of treated as a black box.
+
+## Answer providers
+
+Current answer providers:
+
+- local_extractive: deterministic local provider for free, repeatable testing
+- openai: optional external provider when an API key is configured
+
+The default provider is local_extractive so the system can be tested without external API calls or token cost.
+
+If OpenAI is selected without an API key, the API returns a clean error instead of silently falling back.
 
 ## Database foundation
 
@@ -255,21 +280,37 @@ Completed:
 - LLM call logging
 - pytest foundation
 
+### Public Milestone 3 — Hybrid retrieval and configurable answer providers
+
+Completed:
+
+- vector retrieval mode
+- BM25 retrieval mode
+- fuzzy retrieval mode
+- hybrid retrieval mode
+- retrieval score details
+- BM25 keyword-overlap fallback for small local corpora
+- configurable answer_provider selection
+- local_extractive default provider
+- optional OpenAI provider
+- answer metadata with provider, token estimates, and estimated cost
+- clean missing OPENAI_API_KEY error
+- no hidden fallback behavior
+
 ## Roadmap
 
 Planned next milestones:
 
-- hybrid retrieval
-- BM25 retrieval
-- fuzzy retrieval
-- configurable answer providers
 - multi-provider orchestration
+- model comparison
 - retrieval evaluation datasets
 - citation validation
 - async ingestion jobs
 - metadata filtering
 - RAGOps dashboard
 - agent/MCP-style tool exposure
+- deployment hardening
+- portfolio documentation polish
 
 ## Project goal
 
@@ -285,6 +326,8 @@ This project is intentionally structured to demonstrate:
 - document ingestion pipelines
 - metadata-driven chunking
 - vector database integration
+- hybrid retrieval
+- configurable LLM provider abstraction
 - cited RAG answer generation
 - audit-friendly RAG architecture
 - production-style AI system design

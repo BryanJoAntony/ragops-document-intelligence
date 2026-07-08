@@ -1,8 +1,11 @@
 from datetime import datetime
-from typing import Any
+from typing import Any, Literal
 from uuid import UUID
 
-from pydantic import BaseModel, ConfigDict
+from pydantic import BaseModel, ConfigDict, Field
+
+
+RetrievalMode = Literal["vector", "bm25", "fuzzy", "hybrid"]
 
 
 class DocumentResponse(BaseModel):
@@ -72,5 +75,6 @@ class RetrievedChunkResponse(BaseModel):
 
 
 class DocumentSearchRequest(BaseModel):
-    query: str
-    top_k: int = 5
+    query: str = Field(..., min_length=1)
+    top_k: int = Field(default=5, ge=1, le=20)
+    retrieval_mode: RetrievalMode = "hybrid"

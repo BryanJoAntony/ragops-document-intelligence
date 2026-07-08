@@ -8,6 +8,7 @@ from app.schemas.documents import (
     RetrievedChunkResponse,
 )
 from app.schemas.query import (
+    AnswerMetadataResponse,
     CitationResponse,
     QueryAnswerResponse,
     QueryAskRequest,
@@ -24,6 +25,7 @@ __all__ = [
     "RetrievedChunkResponse",
     "QueryAskRequest",
     "CitationResponse",
+    "AnswerMetadataResponse",
     "QueryAnswerResponse",
     "QueryAuditResponse",
 ]

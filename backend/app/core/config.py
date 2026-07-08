@@ -33,10 +33,20 @@ class Settings(BaseSettings):
     embedding_dimension: int = 384
 
     retrieval_top_k: int = 5
-
-    answer_provider: str = "local_extractive"
-    answer_model: str = "local_extractive_v1"
+    default_retrieval_mode: str = "hybrid"
+    vector_weight: float = 0.55
+    bm25_weight: float = 0.30
+    fuzzy_weight: float = 0.15
     max_context_chunks: int = 5
+    
+    default_answer_provider: str = "local_extractive"
+    local_answer_model: str = "local_extractive_v1"
+    
+    openai_api_key: str = ""
+    openai_answer_model: str = "gpt-4o-mini"
+    openai_timeout_seconds: int = 30
+    openai_max_output_tokens: int = 700
+    openai_temperature: float = 0.1
 
     model_config = SettingsConfigDict(
         env_file=".env",

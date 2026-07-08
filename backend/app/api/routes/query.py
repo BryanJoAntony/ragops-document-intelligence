@@ -3,6 +3,7 @@ from sqlalchemy.orm import Session
 
 from app.api.deps import get_db
 from app.schemas.query import (
+    AnswerMetadataResponse,
     CitationResponse,
     QueryAnswerResponse,
     QueryAskRequest,
@@ -22,13 +23,19 @@ def ask_question(
     service = RagQueryService(db)
 
     try:
-        request_id, generated_answer, retrieved_chunks, latency_ms = service.ask(
+        request_id, generated_answer, retrieved_chunks, latency_ms, retrieval_mode = service.ask(
             question=request.question,
             top_k=request.top_k,
             document_id=request.document_id,
+            retrieval_mode=request.retrieval_mode,
+            answer_provider=request.answer_provider,
         )
     except NotImplementedError as exc:
         raise HTTPException(status_code=501, detail=str(exc)) from exc
+    except ValueError as exc:
+        raise HTTPException(status_code=400, detail=str(exc)) from exc
+    except Exception as exc:
+        raise HTTPException(status_code=502, detail=f"Answer provider failed: {exc}") from exc
 
     citations = [
         CitationResponse(
@@ -50,10 +57,22 @@ def ask_question(
         answer=generated_answer.answer,
         citations=citations,
         retrieval={
+            "mode": retrieval_mode,
             "top_k": request.top_k,
             "retrieved_chunks": len(retrieved_chunks),
             "citations_used": len(citations),
+            "score_details": [
+                chunk.metadata.get("score_details", {})
+                for chunk in retrieved_chunks
+            ],
         },
+        answer_metadata=AnswerMetadataResponse(
+            answer_provider=generated_answer.provider,
+            input_token_estimate=generated_answer.input_token_estimate,
+            output_token_estimate=generated_answer.output_token_estimate,
+            total_token_estimate=generated_answer.total_token_estimate,
+            estimated_cost_usd=generated_answer.estimated_cost_usd,
+        ),
         model_name=generated_answer.model_name,
         latency_ms=latency_ms,
     )

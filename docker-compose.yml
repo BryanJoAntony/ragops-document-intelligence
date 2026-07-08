@@ -33,6 +33,10 @@ services:
       EMBEDDING_MODEL: sentence-transformers/all-MiniLM-L6-v2
       EMBEDDING_DIMENSION: 384
       RETRIEVAL_TOP_K: 5
+      DEFAULT_RETRIEVAL_MODE: hybrid
+      VECTOR_WEIGHT: 0.55
+      BM25_WEIGHT: 0.30
+      FUZZY_WEIGHT: 0.15
       ANSWER_PROVIDER: local_extractive
       ANSWER_MODEL: local_extractive_v1
       MAX_CONTEXT_CHUNKS: 5

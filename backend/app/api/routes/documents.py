@@ -111,10 +111,11 @@ def search_document(
 ) -> list[RetrievedChunkResponse]:
     service = RetrievalService(db)
 
-    return service.vector_search(
+    return service.search(
         query=request.query,
         top_k=request.top_k,
         document_id=document_id,
+        retrieval_mode=request.retrieval_mode,
     )
 
 
