@@ -1,17 +1,18 @@
-﻿# RAGOps Document Intelligence
+# RAGOps Document Intelligence
 
-Production-style RAG/document-intelligence backend with retrieval, citations, evaluation, observability, async jobs, model routing, and a minimal dashboard frontend.
+RAG/document-intelligence backend for making document answers retrievable, cited, evaluated, audited, and observable.
 
-This project focuses on making RAG answers traceable and measurable. It is not an agentic AI project. The goal is to show how uploaded documents can be ingested, indexed, queried, cited, evaluated, audited, and monitored through backend APIs and a lightweight dashboard.
+This project shows how uploaded documents can move through a complete RAGOps-style workflow: ingestion, parsing, chunking, indexing, retrieval, cited answer generation, evaluation, citation validation, async job tracking, dashboard metrics, and cost-aware routing plans.
 
-## What this project does
+The backend is built with FastAPI, PostgreSQL, Qdrant, Redis, and Docker Compose. A minimal React dashboard is included for local inspection and demo use.
 
-RAGOps Document Intelligence supports:
+## What this project includes
 
 - Document upload and ingestion
 - Document parsing and chunking
-- Vector indexing with Qdrant
-- PostgreSQL-backed document, chunk, audit, evaluation, citation-validation, and job storage
+- File hashing and duplicate handling
+- PostgreSQL-backed document, chunk, audit, evaluation, citation-validation, and async-job storage
+- Qdrant vector indexing
 - Redis service integration
 - Vector retrieval
 - BM25 retrieval
@@ -21,14 +22,14 @@ RAGOps Document Intelligence supports:
 - Cited answer generation
 - Local deterministic answer providers
 - Optional OpenAI answer provider
-- Answer provider comparison mode
+- Single-provider and compare-mode answer orchestration
 - Query audit logging
 - Provider call logging
 - Citation validation
 - Evaluation runs
 - Reusable evaluation datasets
 - Benchmark run reporting
-- Run comparison
+- Evaluation run comparison
 - Async evaluation jobs
 - Dashboard metrics APIs
 - Model routing and cost planning
@@ -38,11 +39,11 @@ RAGOps Document Intelligence supports:
 
 This is a local portfolio project built in milestones.
 
-The backend is functional locally using Docker Compose. The frontend is a minimal local dashboard/demo layer. The project is not presented as a fully deployed enterprise product.
+The backend runs locally through Docker Compose. The frontend is a lightweight local dashboard for inspecting the backend. The project is not presented as a fully deployed enterprise product.
 
 ## Tech stack
 
-Backend:
+### Backend
 
 - Python
 - FastAPI
@@ -54,17 +55,18 @@ Backend:
 - Docker Compose
 - pytest
 
-Retrieval / RAG:
+### Retrieval and RAG
 
 - Vector retrieval
 - BM25 retrieval
 - Fuzzy matching
 - Hybrid retrieval
+- Metadata filters
 - Cited answer generation
 - Citation validation
-- Evaluation scoring
+- Deterministic evaluation scoring
 
-Frontend:
+### Frontend
 
 - React
 - Vite
@@ -116,14 +118,14 @@ PostgreSQL is the durable source of truth for application data. Qdrant stores ve
 
 ## Main API areas
 
-Health:
+### Health
 
 ~~~text
 GET /health
 GET /health/deps
 ~~~
 
-Documents:
+### Documents
 
 ~~~text
 POST /documents/upload
@@ -133,20 +135,20 @@ GET /documents
 GET /documents/{document_id}
 ~~~
 
-Query/RAG:
+### Query / RAG
 
 ~~~text
 POST /query/ask
 GET /query/audits/{request_id}
 ~~~
 
-Citation validation:
+### Citation validation
 
 ~~~text
 POST /citations/validate-rag
 ~~~
 
-Evaluations:
+### Evaluations
 
 ~~~text
 POST /evaluations/run
@@ -159,14 +161,14 @@ GET /evaluations/datasets/{dataset_id}
 POST /evaluations/datasets/{dataset_id}/run
 ~~~
 
-Async jobs:
+### Async jobs
 
 ~~~text
 POST /jobs/evaluations/run
 GET /jobs/{job_id}
 ~~~
 
-Dashboard:
+### Dashboard
 
 ~~~text
 GET /dashboard/overview
@@ -175,7 +177,7 @@ GET /dashboard/retrieval
 GET /dashboard/jobs
 ~~~
 
-Routing:
+### Routing
 
 ~~~text
 POST /routing/answer-plan
@@ -224,7 +226,7 @@ Apply migrations:
 docker compose exec api alembic upgrade head
 ~~~
 
-Run tests:
+Run backend tests:
 
 ~~~powershell
 docker compose exec api pytest -q
@@ -244,7 +246,7 @@ http://localhost:8000/docs
 
 ## Running the frontend
 
-Use Node.js 22+.
+Use Node.js 22 or later.
 
 From the frontend folder:
 
@@ -266,7 +268,7 @@ Production build:
 npm.cmd run build
 ~~~
 
-## Dashboard frontend pages
+## Dashboard frontend
 
 The minimal dashboard includes:
 
@@ -277,19 +279,21 @@ The minimal dashboard includes:
 - Routing
 - Ask Demo
 
-The frontend is intentionally lightweight. It is a local demo/observability layer over the backend APIs.
+The frontend is intentionally lightweight. It is a local observability and demo layer over the backend APIs.
 
 ## Evaluation and citation validation
 
-The project includes a deterministic evaluation foundation for checking:
+The project includes deterministic evaluation foundations for checking:
 
 - whether an answer exists
 - whether citations exist
 - whether retrieved context exists
-- expected answer keyword overlap
-- citation validation score
+- expected-answer keyword overlap
+- citation-validation score
 
-Citation validation checks cited answer markers against retrieved/cited chunks and stores validation results for later inspection.
+Citation validation checks cited answer markers against returned citations and retrieved chunks. Validation results are persisted for later inspection.
+
+This is not presented as full semantic entailment verification or an LLM-judge system.
 
 ## Model routing and cost planning
 
@@ -303,7 +307,7 @@ The routing endpoint recommends an answer provider or strategy based on:
 - estimated cost
 - provider availability
 
-This is a planning layer only. It does not automatically execute fallback or hidden provider switching.
+This is a transparent planning layer. It does not automatically execute fallback or hidden provider switching.
 
 ## Async job processing
 
@@ -318,38 +322,36 @@ Supported job states:
 
 The current implementation uses FastAPI BackgroundTasks. It is suitable as a local async foundation, not a full distributed worker queue.
 
-## Milestones completed
+## Implementation summary
 
-~~~text
-M0  Docker foundation
-M1  Database foundation
-M2  Document ingestion
-M3  Parsing, chunking, metadata
-M4  Embeddings and Qdrant indexing
-M5  Cited RAG answers and audit logs
-M6  Hybrid retrieval
-M7  Configurable answer providers
-M8  Answer orchestration and provider comparison
-M9  Evaluation framework
-M10 Citation validation
-M11 Evaluation + citation validation integration
-M12 Evaluation datasets and repeatable benchmarks
-M13 Evaluation reporting and run comparison
-M14 Async processing pipeline
-M15 Metadata filtering and advanced retrieval foundation
-M16 Dashboard backend metrics
-M17 Model routing and cost planning
-M18 Production hardening / query audit metadata
-M19 Minimal dashboard frontend
-M20 Final documentation and portfolio packaging
-~~~
+The project was built across focused milestones covering:
+
+- Docker and service foundation
+- PostgreSQL schema and Alembic migrations
+- Document upload, storage, parsing, and chunking
+- Embedding generation and Qdrant indexing
+- Cited RAG answers and audit logging
+- Vector, BM25, fuzzy, and hybrid retrieval
+- Configurable answer providers
+- Answer orchestration and compare mode
+- Evaluation framework
+- Citation validation
+- Evaluation datasets and repeatable benchmark runs
+- Evaluation reporting and run comparison
+- Async evaluation jobs
+- Metadata-aware retrieval
+- Dashboard backend metrics
+- Model routing and cost planning
+- Query-audit retrieval metadata
+- Minimal React dashboard frontend
+- Final documentation and portfolio packaging
 
 ## Known limitations
 
 - Local portfolio/demo project, not a deployed enterprise system.
 - No authentication or authorization yet.
-- No tenant-level access control enforcement yet.
-- No production secrets management setup.
+- No tenant-level access-control enforcement yet.
+- No production secrets-management setup.
 - No production frontend container yet.
 - No durable distributed worker queue yet.
 - No automatic model fallback execution.
@@ -371,4 +373,4 @@ This project is best described as:
 RAG backend + document intelligence + evaluation + observability
 ~~~
 
-It is intentionally separate from agentic workflow orchestration. Agent/tool/MCP-style work belongs in a separate project.
+It is focused on RAG/document intelligence and traceability. Agentic workflows, tool orchestration, and MCP-style work are intentionally kept separate for a different project.
