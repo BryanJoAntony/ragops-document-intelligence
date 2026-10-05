@@ -1,0 +1,37 @@
+﻿# Python
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.venv/
+venv/
+
+# Environment / secrets
+.env
+*.env
+backend/.env
+frontend/.env
+
+# Logs
+logs/
+*.log
+
+# Runtime/temp
+*.tmp
+*.sqlite
+*.db
+ask_*.json
+eval_run.json
+citation_validate.json
+dataset.json
+dataset_run.json
+async_eval.json
+routing_plan.json
+search_body.json
+
+# Frontend
+frontend/node_modules/
+frontend/dist/
+
+# Snapshots / archives
+*.zip
+SNAPSHOT_NOTE_*.md

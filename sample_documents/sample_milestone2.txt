@@ -1,0 +1,7 @@
+RAGOps Document Intelligence - Sample Upload
+
+This is a small local test document for Milestone 2.
+
+The goal of this milestone is to verify that the API can accept a file upload, calculate a SHA-256 hash, save the file through the configured storage backend, and store document metadata in PostgreSQL.
+
+No parsing, chunking, vector indexing, or LLM calls are implemented in this milestone.

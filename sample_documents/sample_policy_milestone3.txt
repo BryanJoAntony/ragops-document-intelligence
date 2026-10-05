@@ -1,0 +1,25 @@
+RAGOps Upload and Retrieval Policy
+
+Overview
+
+This policy describes how uploaded documents should be processed in the RAGOps document intelligence platform.
+
+Upload Requirements
+
+Every uploaded document must be assigned a SHA-256 file hash. Duplicate files should not create duplicate document records. The system should store durable metadata in PostgreSQL and store the file content through the configured storage backend.
+
+Storage Requirements
+
+Local storage is used for development. Cloud storage can be added later through the storage service interface. The API should not depend directly on one storage provider.
+
+Parsing Requirements
+
+Documents should be parsed before retrieval. The parser should extract readable text and update the document status. If parsing fails, the document should be marked as failed and the error should be stored for debugging.
+
+Chunking Requirements
+
+Chunks should preserve useful context and include metadata such as tags, section title, page number, parser name, and token estimate.
+
+Audit Requirements
+
+Important workflow history should be stored in PostgreSQL. Logs are useful for debugging, but durable audit history should not depend only on log files.
